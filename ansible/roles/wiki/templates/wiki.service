@@ -1,0 +1,11 @@
+[Unit]
+Description=gowiki
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+ExecStart=/home/vagrant/gowiki/wiki
+
+[Install]
+WantedBy=multi-user.target

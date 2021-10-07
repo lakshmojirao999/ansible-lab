@@ -1,0 +1,13 @@
+---
+- hosts: web2.demo.com
+  become: yes
+  become_user: root
+  gather_facts: true
+
+  tasks:
+   - user: name= '{{ item  }}' state=present
+     loop:
+     #with_items:
+      - joe
+      - ravi
+      - chakri

@@ -1,0 +1,11 @@
+- name: install golang
+  hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+
+
+  tasks:
+  - name: Disabling SELinux state
+    selinux:
+      state: disabled

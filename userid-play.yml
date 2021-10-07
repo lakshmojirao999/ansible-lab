@@ -1,0 +1,23 @@
+---
+- hosts: web2.demo.com
+  become: yes
+  become_user: root
+  gather_facts: true
+
+  vars:
+    users:
+      - joe
+      - ravi
+      - chakri
+
+  tasks:
+   - user: name= '{{ item.name  }}' state=present uid= '{{ item.uid }}'
+     loop:
+     #with_items
+      - name: joe
+        uid: 1010
+      - name: ravi
+        uid: 1011
+      - name: chakri
+        uid: 1012
+    with_items: "{{ users }}"

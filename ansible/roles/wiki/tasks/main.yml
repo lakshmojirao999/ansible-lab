@@ -1,0 +1,44 @@
+
+
+- name: Create GoApp Directory
+  file:
+    path: /home/vagrant/gowiki
+    state: directory
+
+- name: Update Go Compile binary
+  template:
+    src: wiki
+    dest: /home/vagrant/gowiki
+
+- name: Delete the default content
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/nginx/sites-enabled/default
+    - /etc/nginx/sites-available/default
+    - /var/www/html
+
+- name: wiki Service file
+  template:
+    src: wiki.service
+    dest: /etc/systemd/system/wiki.service
+
+- name: Start wiki Service
+  systemd:
+    name: wiki
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+
+- name: Update GoApp Config file
+  template:
+    src: wiki.conf
+    dest: /etc/nginx/sites-enabled/wiki.conf   
+
+- name: Enable new site
+  file:
+    src: /etc/nginx/sites-available/wiki.conf   
+    dest: /etc/nginx/sites-enabled/wiki.conf   
+    state: link
+  notify: Restart Nginx      

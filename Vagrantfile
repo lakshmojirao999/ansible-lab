@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
     {
       :name => "ansible-host",
       :box => "centos/8",
-      :ram => 8048,
+      :ram => 4028,
       :vcpu => 1,
       :ip => "192.168.29.4"
     }

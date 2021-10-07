@@ -4,6 +4,9 @@
   become_user: root
   gather_facts: true
  
+  vars: 
+    repository:  https://github.com/mikecali/demo_app.git
+
   tasks:
     - name: add epel repository
       yum:
@@ -20,6 +23,48 @@
         name: ansible
         state: latest
       when: "'ansible-host' in inventory_hostname"
+
+    - name: Install http
+      yum: name={{ item }} state=present
+      with_items:
+         - httpd
+         - php
+         - php-mysqlnd
+         - git
+      become: true
+      when: "'web' in inventory_hostname"
+
+    - name: http service state
+      service: name=httpd state=started enabled=yes
+      become: true
+      when: "'web' in inventory_hostname"
+    
+    - name: enabled mod_rewrite
+      apache2_module: name=rewrite state=present
+      notify:
+        - restart apache2
+      when: "'web' in inventory_hostname"
+
+    - name: Copy the code from repository
+      git: repo={{ repository }} dest=/var/www/html/
+      become: true
+      when: "'web' in inventory_hostname"
+
+    - name: Start firewalld
+      service:
+        state: restarted
+        name: firewalld
+      when: "'web' in inventory_hostname or 'ansible-host' in inventory_hostname"
+      become_user: root
+
+    - name: Allow apache 
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        zone: public
+      when: "'web' in inventory_hostname"
+      become_user: root
 
     - name: Install and start Cockpit
       yum:
@@ -63,6 +108,12 @@
          zone: public
       become_user: root
 
+    - name: Restart firewalld
+      service:
+        state: restarted
+        name: firewalld
+      when: "'web' in inventory_hostname or 'ansible-host' in inventory_hostname"
+      become_user: root
 
     - name: Copy vagrant key
       copy:
@@ -73,3 +124,7 @@
         mode: 0600
       when: "'ansible-host' in inventory_hostname"
 
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+      when: "'web' in inventory_hostname"

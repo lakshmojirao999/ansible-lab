@@ -1,0 +1,4 @@
+--- 
+home_dir: "/home/vagrant"
+file_owner: "vagrant"
+new_go_version: "1.17.1"

@@ -1,0 +1,4 @@
+---
+- name: Restart wiki
+  service: name=wiki state=restarted
+  become: yes
